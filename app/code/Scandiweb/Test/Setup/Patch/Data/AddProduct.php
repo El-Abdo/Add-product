@@ -6,20 +6,20 @@ namespace Scandiweb\Test\Setup\Patch\Data;
 
 use Magento\Catalog\Api\CategoryLinkManagementInterface;
 use Magento\Catalog\Api\CategoryRepositoryInterface;
-use Magento\Catalog\Api\ProductRepositoryInterface;
-use Magento\Catalog\Model\Product\Visibility;
-use Magento\Catalog\Model\Product\Type;
-use Magento\Catalog\Model\Product\Attribute\Source\Status;
-use Magento\Framework\Setup\ModuleDataSetupInterface;
-use Magento\Framework\Setup\Patch\DataPatchInterface;
-use Magento\Framework\App\State;
 use Magento\Catalog\Api\Data\ProductInterfaceFactory;
+use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\Product\Attribute\Source\Status;
+use Magento\Catalog\Model\Product\Type;
+use Magento\Catalog\Model\Product\Visibility;
 use Magento\Eav\Setup\EavSetup;
+use Magento\Framework\App\State;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Setup\ModuleDataSetupInterface;
+use Magento\Framework\Setup\Patch\DataPatchInterface;
 use Magento\Framework\Validation\ValidationException;
 use Magento\InventoryApi\Api\Data\SourceItemInterface;
 use Magento\InventoryApi\Api\Data\SourceItemInterfaceFactory;
@@ -28,26 +28,38 @@ use Magento\Store\Model\StoreManagerInterface;
 
 class AddProduct implements DataPatchInterface
 {
+    /**
+     * @var array
+     */
     protected array $sourceItems = [];
 
+    /**
+     * @param ModuleDataSetupInterface $moduleDataSetup
+     * @param ProductInterfaceFactory $productInterfaceFactory
+     * @param EavSetup $eavSetup
+     * @param StoreManagerInterface $storeManager
+     * @param ProductRepositoryInterface $productRepository
+     * @param State $appState
+     * @param SourceItemInterfaceFactory $sourceItemFactory
+     * @param SourceItemsSaveInterface $sourceItemsSaveInterface
+     * @param CategoryLinkManagementInterface $categoryLink
+     * @param CategoryRepositoryInterface $categoryRepository
+     */
     public function __construct(
-        protected ModuleDataSetupInterface        $moduleDataSetup,
-        protected ProductInterfaceFactory         $productInterfaceFactory,
-        protected EavSetup                        $eavSetup,
-        protected StoreManagerInterface           $storeManager,
-        protected ProductRepositoryInterface      $productRepository,
-        protected State                           $appState,
-        protected SourceItemInterfaceFactory      $sourceItemFactory,
-        protected SourceItemsSaveInterface        $sourceItemsSaveInterface,
+        protected ModuleDataSetupInterface $moduleDataSetup,
+        protected ProductInterfaceFactory $productInterfaceFactory,
+        protected EavSetup $eavSetup,
+        protected StoreManagerInterface $storeManager,
+        protected ProductRepositoryInterface $productRepository,
+        protected State $appState,
+        protected SourceItemInterfaceFactory $sourceItemFactory,
+        protected SourceItemsSaveInterface $sourceItemsSaveInterface,
         protected CategoryLinkManagementInterface $categoryLink,
-        protected CategoryRepositoryInterface     $categoryRepository
-
-    )
-    {
-
+        protected CategoryRepositoryInterface $categoryRepository
+    ) {
     }
 
-    public function apply()
+    public function apply(): void
     {
         $this->appState->emulateAreaCode('adminhtml', [$this, 'execute']);
 
@@ -60,11 +72,8 @@ class AddProduct implements DataPatchInterface
      * @throws NoSuchEntityException
      * @throws ValidationException
      */
-    public function execute()
+    public function execute(): void
     {
-        $this->moduleDataSetup->getConnection()->startSetup();
-
-
         $sku = 'scandiweb-test-product';
         $product = $this->productInterfaceFactory->create();
 
@@ -99,15 +108,19 @@ class AddProduct implements DataPatchInterface
 
         $this->categoryLink->assignProductToCategories($savedProduct->getSku(), [11]);
 
-
-        $this->moduleDataSetup->getConnection()->endSetup();
     }
 
+    /**
+     * @return array|string[]
+     */
     public static function getDependencies(): array
     {
         return [];
     }
 
+    /**
+     * @return array|string[]
+     */
     public function getAliases(): array
     {
         return [];
